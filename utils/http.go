@@ -1,4 +1,4 @@
-package util
+package utils
 
 import (
 	"bytes"
@@ -41,6 +41,20 @@ func PostJSON(uri string, obj interface{}) ([]byte, error) {
 	return ioutil.ReadAll(response.Body)
 }
 
+// Get get 请求
+func Get(uri string, resp interface{}) error {
+	response, err := http.Get(uri)
+	if err != nil {
+		return err
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusOK {
+		return fmt.Errorf("http get error : uri=%v , statusCode=%v", uri, response.StatusCode)
+	}
+	return json.NewDecoder(response.Body).Decode(resp)
+}
+
 // JsonStructToMap ...
 func JsonStructToMap(content interface{}) (map[string]interface{}, error) {
 	var name map[string]interface{}
@@ -58,4 +72,21 @@ func JsonStructToMap(content interface{}) (map[string]interface{}, error) {
 		}
 	}
 	return name, nil
+}
+
+func EncodeURL(api string, queries map[string]interface{}) (string, error) {
+	url, err := url.Parse(api)
+	if err != nil {
+		return "", err
+	}
+
+	query := url.Query()
+
+	for k, v := range queries {
+		query.Set(k, fmt.Sprintf("%v", v))
+	}
+
+	url.RawQuery = query.Encode()
+
+	return url.String(), nil
 }

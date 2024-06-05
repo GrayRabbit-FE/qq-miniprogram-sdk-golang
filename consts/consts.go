@@ -2,8 +2,8 @@ package consts
 
 const (
 	SuccessCode                       = 1
-	BaseUrl                           = "https://open.kuaishou.com"
-	Code2SessionEndPoint              = "/oauth2/mp/code2session"
+	BaseUrl                           = "https://api.q.qq.com"
+	Code2SessionEndPoint              = "/sns/jscode2session"
 	PayCreateOrderEndPoint            = "/openapi/mp/developer/epay/create_order"
 	PayCreateOrderWithChannelEndPoint = "/openapi/mp/developer/epay/create_order_with_channel"
 	QueryOrderEndPoint                = "/openapi/mp/developer/epay/query_order"

@@ -4,13 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
-	"qq-server-sdk/consts"
 	"sync"
 	"time"
 
-	cache "github.com/GrayRabbit-FE/qq-miniprogram-sdk-golang/utils/cache"
-
-	"util"
+	"github.com/GrayRabbit-FE/qq-miniprogram-sdk-golang/consts"
 )
 
 const accessTokenURL = consts.BaseUrl + consts.AccessTokenEndpoint
@@ -22,22 +19,22 @@ type AccessToken interface {
 	GetAccessToken() (string, error) // 获取token
 }
 
-// DefaultAccessToken 默认的token管理类
-type DefaultAccessToken struct {
+// AccessTokenManager 默认的token管理类
+type AccessTokenManager struct {
 	AppId               string      // app_id	string	是	小程序的 app_id
 	AppSecret           string      // app_secret	string	是	小程序的密钥
 	GrantType           string      // grant_type	string	是	固定值“client_credentials”
-	Cache               cache.Cache // 缓存组件
+	Cache               Cache       // 缓存组件
 	accessTokenLock     *sync.Mutex // 读写锁
 	accessTokenCacheKey string      // 缓存的key
 }
 
-// NewDefaultAccessToken 实例化默认的token管理类
-func NewDefaultAccessToken(appId, appSecret string, cache cache.Cache) AccessToken {
+// NewAccessTokenManager 实例化默认的token管理类
+func NewAccessTokenManager(appId, appSecret string, cache Cache) AccessToken {
 	if cache == nil {
 		panic(any("cache is need"))
 	}
-	token := &DefaultAccessToken{
+	token := &AccessTokenManager{
 		AppId:               appId,
 		AppSecret:           appSecret,
 		GrantType:           "client_credentials",
@@ -49,17 +46,17 @@ func NewDefaultAccessToken(appId, appSecret string, cache cache.Cache) AccessTok
 }
 
 // GetCacheKey 获取缓存key
-func (dd *DefaultAccessToken) GetCacheKey() string {
+func (dd *AccessTokenManager) GetCacheKey() string {
 	return dd.accessTokenCacheKey
 }
 
 // SetCacheKey 设置缓存key
-func (dd *DefaultAccessToken) SetCacheKey(key string) {
+func (dd *AccessTokenManager) SetCacheKey(key string) {
 	dd.accessTokenCacheKey = key
 }
 
 // GetAccessToken 获取token
-func (dd *DefaultAccessToken) GetAccessToken() (string, error) {
+func (dd *AccessTokenManager) GetAccessToken() (string, error) {
 	// 先尝试从缓存中获取如果不存在就调用接口获取
 	if val := dd.Cache.Get(dd.GetCacheKey()); val != nil {
 		return val.(string), nil
@@ -100,7 +97,7 @@ type ResAccessToken struct {
 // GetTokenFromServer 从快手服务器获取token
 func GetTokenFromServer(apiUrl string, appId, appSecret string) (resAccessToken ResAccessToken, err error) {
 	params := url.Values{"app_id": []string{appId}, "app_secret": []string{appSecret}, "grant_type": []string{"client_credentials"}}
-	body, err := util.PostForm(apiUrl, params)
+	body, err := PostForm(apiUrl, params)
 	if err != nil {
 		return
 	}
