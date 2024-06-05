@@ -1,18 +1,19 @@
-package accesstoken
+package utils
 
 import (
 	"encoding/json"
 	"fmt"
 	"net/url"
+	"qq-server-sdk/consts"
 	"sync"
 	"time"
 
-	"utils/cache"
+	cache "github.com/GrayRabbit-FE/qq-miniprogram-sdk-golang/utils/cache"
 
 	"util"
 )
 
-const accessTokenURL = "https://open.kuaishou.com/oauth2/access_token"
+const accessTokenURL = consts.BaseUrl + consts.AccessTokenEndpoint
 
 // AccessToken 管理AccessToken 的基础接口
 type AccessToken interface {
